@@ -6,198 +6,237 @@ import java.io.PrintWriter;
 import java.util.LinkedList;
 import java.util.Scanner;
 
+/**
+ * This class implements a simple student management system.
+ */
 public class Programa {
+ 
     public static void main(String[] args) {
-        String nombreArchivo = "Progra.txt";
+        String fileName = "Progra.txt"; // Name of the file storing student data
         Scanner scanner = new Scanner(System.in);
         
         do {
-            // LinkedList para almacenar la lista de estudiantes
-            LinkedList<String> listaEstudiantes = cargarListaEstudiantes(nombreArchivo);
+            // Load the list of students from the file
+            LinkedList<String> studentList = loadStudentList(fileName);
 
-            // Realizar operaciones de gestión de estudiantes
-            System.out.println("\nOperaciones de gestión de estudiantes:");
-            System.out.println("1. Remover estudiante");
-            System.out.println("2. Editar estudiante");
-            System.out.println("3. Buscar estudiante");
-            System.out.println("4. Mostrar estado actual del archivo");
-            System.out.println("5. Agregar nuevo estudiante al final");
-            System.out.println("6. Agregar nuevo estudiante al inicio");
-            System.out.println("7. Salir");
-            System.out.print("Ingrese el número de la operación que desea realizar: ");
-            int operacion = scanner.nextInt();
-            scanner.nextLine(); // Consumir la nueva línea después del nextInt()
+            // Display menu options
+            System.out.println("\nStudent management operations:");
+            System.out.println("1. Remove student");
+            System.out.println("2. Edit student");
+            System.out.println("3. Search student");
+            System.out.println("4. Show current file status");
+            System.out.println("5. Add new student at the end");
+            System.out.println("6. Add new student at the beginning");
+            System.out.println("7. Exit");
+            System.out.print("Enter the number of the operation you want to perform: ");
+            int operation = scanner.nextInt();
+            scanner.nextLine();
 
-            switch (operacion) {
+            // Perform the selected operation based on user input
+            switch (operation) {
                 case 1:
-                    removerEstudiante(listaEstudiantes, nombreArchivo);
+                    removeStudent(studentList, fileName);
                     break;
                 case 2:
-                    editarEstudiante(listaEstudiantes, nombreArchivo);
+                    editStudent(studentList, fileName);
                     break;
                 case 3:
-                    buscarEstudiante(listaEstudiantes);
+                    searchStudent(studentList);
                     break;
                 case 4:
-                    mostrarEstadoArchivo(nombreArchivo);
+                    showFileStatus(fileName);
                     break;
                 case 5:
-                    agregarNuevoEstudiante(listaEstudiantes, nombreArchivo, false); // Agregar al final
+                    addNewStudent(studentList, fileName, false);
                     break;
                 case 6:
-                    agregarNuevoEstudiante(listaEstudiantes, nombreArchivo, true); // Agregar al inicio
+                    addNewStudent(studentList, fileName, true); 
                     break;
                 case 7:
-                    System.out.println("Saliendo del programa...");
-                    return; // Salir del método main y del programa
+                    System.out.println("Exiting the program...");
+                    return;
                 default:
-                    System.out.println("Operación no válida. Intente de nuevo.");
+                    System.out.println("Invalid operation. Please try again.");
             }
 
         } while (true);
     }
 
-    // Función para cargar la lista de estudiantes desde el archivo
-    private static LinkedList<String> cargarListaEstudiantes(String nombreArchivo) {
-        LinkedList<String> listaEstudiantes = new LinkedList<>();
+    /**
+     * Loads the list of students from the specified file.
+     *
+     * @param fileName The name of the file to load student data from.
+     * @return A linked list containing the student data.
+     */
+    private static LinkedList<String> loadStudentList(String fileName) {
+        LinkedList<String> studentList = new LinkedList<>();
         try {
-            BufferedReader br = new BufferedReader(new FileReader(nombreArchivo));
-            String linea;
-            while ((linea = br.readLine()) != null) {
-                listaEstudiantes.add(linea);
+            BufferedReader br = new BufferedReader(new FileReader(fileName));
+            String line;
+            while ((line = br.readLine()) != null) {
+                studentList.add(line);
             }
             br.close();
         } catch (IOException e) {
-            System.err.println("Error al cargar la lista de estudiantes: " + e.getMessage());
+            System.err.println("Error loading student list: " + e.getMessage());
         }
-        return listaEstudiantes;
+        return studentList;
     }
 
-    // Función para guardar la lista de estudiantes en el archivo
-    private static void guardarListaEstudiantes(LinkedList<String> listaEstudiantes, String nombreArchivo) {
+    /**
+     * Saves the list of students to the specified file.
+     *
+     * @param studentList The list of students to save.
+     * @param fileName    The name of the file to save student data to.
+     */
+    private static void saveStudentList(LinkedList<String> studentList, String fileName) {
         try {
-            PrintWriter pw = new PrintWriter(new FileWriter(nombreArchivo));
-            for (String estudiante : listaEstudiantes) {
-                pw.println(estudiante);
+            PrintWriter pw = new PrintWriter(new FileWriter(fileName));
+            for (String student : studentList) {
+                pw.println(student);
             }
             pw.close();
         } catch (IOException e) {
-            System.err.println("Error al guardar la lista de estudiantes: " + e.getMessage());
+            System.err.println("Error saving student list: " + e.getMessage());
         }
     }
 
-    // Función para remover un estudiante de la lista
-    private static void removerEstudiante(LinkedList<String> listaEstudiantes, String nombreArchivo) {
+    /**
+     * Removes a student from the list based on the given full name.
+     *
+     * @param studentList The list of students to remove from.
+     * @param fileName    The name of the file storing student data.
+     */
+    private static void removeStudent(LinkedList<String> studentList, String fileName) {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Ingrese el nombre completo del estudiante que desea remover: ");
-        String nombreCompleto = scanner.nextLine();
-        boolean removido = listaEstudiantes.removeIf(estudiante -> estudiante.contains(nombreCompleto));
-        if (removido) {
-            guardarListaEstudiantes(listaEstudiantes, nombreArchivo);
-            System.out.println("Estudiante removido exitosamente.");
+        System.out.print("Enter the full name of the student you want to remove: ");
+        String fullName = scanner.nextLine();
+        boolean removed = studentList.removeIf(student -> student.contains(fullName));
+        if (removed) {
+            saveStudentList(studentList, fileName);
+            System.out.println("Student removed successfully.");
         } else {
-            System.out.println("No se encontró al estudiante en la lista.");
+            System.out.println("Student not found in the list.");
         }
     }
 
-    // Función para editar un estudiante en la lista
-    private static void editarEstudiante(LinkedList<String> listaEstudiantes, String nombreArchivo) {
+    /**
+     * Edits a student's information based on the given full name.
+     *
+     * @param studentList The list of students to edit.
+     * @param fileName    The name of the file storing student data.
+     */
+    private static void editStudent(LinkedList<String> studentList, String fileName) {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Ingrese el nombre completo del estudiante que desea editar: ");
-        String nombreCompleto = scanner.nextLine();
-        for (int i = 0; i < listaEstudiantes.size(); i++) {
-            String estudiante = listaEstudiantes.get(i);
-            if (estudiante.contains(nombreCompleto)) {
-                System.out.println("Estudiante encontrado. Ingrese los nuevos datos:");
-                System.out.print("Nueva sigla: ");
-                String sigla = scanner.nextLine();
-                System.out.print("Nuevo grupo: ");
-                String grupo = scanner.nextLine();
-                System.out.print("Nueva modalidad de estudio: ");
-                String modalidadEstudio = scanner.nextLine();
-                System.out.print("Nuevo carné: ");
-                String carne = scanner.nextLine();
-                System.out.print("Nuevo nombre completo: ");
-                String nuevoNombreCompleto = scanner.nextLine();
-                System.out.print("Nueva dirección electrónica institucional: ");
-                String direccionElectronica = scanner.nextLine();
-                System.out.print("Nuevo tipo de matrícula: ");
-                String tipoMatricula = scanner.nextLine();
-                String nuevoEstudiante = sigla + "\t" + grupo + "\t" + modalidadEstudio + "\t" + carne + "\t" +
-                                         nuevoNombreCompleto + "\t" + direccionElectronica + "\t" + tipoMatricula;
-                listaEstudiantes.set(i, nuevoEstudiante);
-                guardarListaEstudiantes(listaEstudiantes, nombreArchivo);
-                System.out.println("Estudiante editado exitosamente.");
-                return; // Salir del método después de editar el estudiante
+        System.out.print("Enter the full name of the student you want to edit: ");
+        String fullName = scanner.nextLine();
+        for (int i = 0; i < studentList.size(); i++) {
+            String student = studentList.get(i);
+            if (student.contains(fullName)) {
+                System.out.println("Student found. Enter the new data:");
+                System.out.print("New code: ");
+                String code = scanner.nextLine();
+                System.out.print("New group: ");
+                String group = scanner.nextLine();
+                System.out.print("New study mode: ");
+                String studyMode = scanner.nextLine();
+                System.out.print("New ID: ");
+                String id = scanner.nextLine();
+                System.out.print("New full name: ");
+                String newFullName = scanner.nextLine();
+                System.out.print("New institutional email address: ");
+                String institutionalEmail = scanner.nextLine();
+                System.out.print("New enrollment type: ");
+                String enrollmentType = scanner.nextLine();
+                String newStudent = code + "\t" + group + "\t" + studyMode + "\t" + id + "\t" +
+                                     newFullName + "\t" + institutionalEmail + "\t" + enrollmentType;
+                studentList.set(i, newStudent);
+                saveStudentList(studentList, fileName);
+                System.out.println("Student edited successfully.");
+                return;
             }
         }
-        System.out.println("No se encontró al estudiante en la lista.");
+        System.out.println("Student not found in the list.");
     }
 
-    // Función para buscar un estudiante en la lista
-    private static void buscarEstudiante(LinkedList<String> listaEstudiantes) {
+    /**
+     * Searches for a student based on the given full name.
+     *
+     * @param studentList The list of students to search in.
+     */
+    private static void searchStudent(LinkedList<String> studentList) {
         Scanner scanner = new Scanner(System.in);
-        System.out.print("Ingrese el nombre completo del estudiante que desea buscar: ");
-        String nombreCompleto = scanner.nextLine();
-        boolean encontrado = false;
-        for (String estudiante : listaEstudiantes) {
-            if (estudiante.contains(nombreCompleto)) {
-                System.out.println("Estudiante encontrado:");
-                System.out.println(estudiante);
-                encontrado = true;
-                break; // Salir del bucle una vez que se encuentra al estudiante
+        System.out.print("Enter the full name of the student you want to search for: ");
+        String fullName = scanner.nextLine();
+        boolean found = false;
+        for (String student : studentList) {
+            if (student.contains(fullName)) {
+                System.out.println("Student found:");
+                System.out.println(student);
+                found = true;
+                break; 
             }
         }
-        if (!encontrado) {
-            System.out.println("No se encontró al estudiante en la lista.");
+        if (!found) {
+            System.out.println("Student not found in the list.");
         }
     }
 
-    // Función para mostrar el estado actual del archivo
-    private static void mostrarEstadoArchivo(String nombreArchivo) {
-        System.out.println("Estado actual del archivo:");
+    /**
+     * Displays the current status of the file storing student data.
+     *
+     * @param fileName The name of the file to display status for.
+     */
+    private static void showFileStatus(String fileName) {
+        System.out.println("Current file status:");
         try {
-            BufferedReader br = new BufferedReader(new FileReader(nombreArchivo));
-            String linea;
-            while ((linea = br.readLine()) != null) {
-                System.out.println(linea);
+            BufferedReader br = new BufferedReader(new FileReader(fileName));
+            String line;
+            while ((line = br.readLine()) != null) {
+                System.out.println(line);
             }
             br.close();
         } catch (IOException e) {
-            System.err.println("Error al mostrar el estado actual del archivo: " + e.getMessage());
+            System.err.println("Error showing current file status: " + e.getMessage());
         }
     }
 
-    // Función para agregar un nuevo estudiante al final o al inicio de la lista
-    private static void agregarNuevoEstudiante(LinkedList<String> listaEstudiantes, String nombreArchivo, boolean alInicio) {
+    /**
+     * Adds a new student to the list.
+     *
+     * @param studentList  The list of students
+     * @param studentList  The list of students to add to.
+     * @param fileName     The name of the file storing student data.
+     * @param atBeginning  A flag indicating whether to add the new student at the beginning or end of the list.
+     */
+    private static void addNewStudent(LinkedList<String> studentList, String fileName, boolean atBeginning) {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Ingrese los datos del nuevo estudiante:");
-        System.out.print("Sigla: ");
-        String sigla = scanner.nextLine();
-        System.out.print("Grupo: ");
-        String grupo = scanner.nextLine();
-        System.out.print("Modalidad de estudio: ");
-        String modalidadEstudio = scanner.nextLine();
-        System.out.print("Carné: ");
-        String carne = scanner.nextLine();
-        System.out.print("Nombre completo: ");
-        String nombreCompleto = scanner.nextLine();
-        System.out.print("Dirección electrónica institucional: ");
-        String direccionElectronica = scanner.nextLine();
-        System.out.print("Tipo de matrícula: ");
-        String tipoMatricula = scanner.nextLine();
+        System.out.println("Enter the details of the new student:");
+        System.out.print("Code: ");
+        String code = scanner.nextLine();
+        System.out.print("Group: ");
+        String group = scanner.nextLine();
+        System.out.print("Study mode: ");
+        String studyMode = scanner.nextLine();
+        System.out.print("ID: ");
+        String id = scanner.nextLine();
+        System.out.print("Full name: ");
+        String fullName = scanner.nextLine();
+        System.out.print("Institutional email address: ");
+        String institutionalEmail = scanner.nextLine();
+        System.out.print("Enrollment type: ");
+        String enrollmentType = scanner.nextLine();
 
-        String nuevoEstudiante = sigla + "\t" + grupo + "\t" + modalidadEstudio + "\t" + carne + "\t" +
-                                 nombreCompleto + "\t" + direccionElectronica + "\t" + tipoMatricula;
+        String newStudent = code + "\t" + group + "\t" + studyMode + "\t" + id + "\t" +
+                             fullName + "\t" + institutionalEmail + "\t" + enrollmentType;
         
-        if (alInicio) {
-            listaEstudiantes.addFirst(nuevoEstudiante);
+        if (atBeginning) {
+            studentList.addFirst(newStudent);
         } else {
-            listaEstudiantes.addLast(nuevoEstudiante);
+            studentList.addLast(newStudent);
         }
 
-        guardarListaEstudiantes(listaEstudiantes, nombreArchivo);
-        System.out.println("Nuevo estudiante agregado correctamente.");
+        saveStudentList(studentList, fileName);
+        System.out.println("New student added successfully.");
     }
 }
-
